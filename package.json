@@ -1,0 +1,29 @@
+{
+  "name": "main_site",
+  "version": "0.0.1",
+  "description": "website portfolio and web services",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rothattack/platerboil.git"
+  },
+  "keywords": [
+    "boilerplate",
+    "starter",
+    "kit",
+    "html",
+    "css",
+    "gulp",
+    "js",
+    "sass"
+  ],
+  "author": "rothattack",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rothattack/platerboil/issues"
+  },
+  "homepage": "https://github.com/rothattack/platerboil"
+}
