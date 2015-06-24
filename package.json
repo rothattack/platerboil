@@ -1,8 +1,8 @@
 {
   "name": "platerboil",
   "version": "0.0.1",
-  "description": "website portfolio and web services",
-  "main": "index.html",
+  "description": "A boilerplate for @rothattack's projects.",
+  "main": "./source/index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
