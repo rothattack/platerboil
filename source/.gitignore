@@ -1,5 +1,11 @@
 #ignore node modules
 node_modules
 
+#ignore source components
+components
+
 #ignore dist folder
 dist
+
+#ignore log files
+npm-debug.log

@@ -3,4 +3,6 @@ node_modules
 
 #ignore dist folder
 dist
-app/npm-debug.log
+
+#ignore log files
+npm-debug.log
