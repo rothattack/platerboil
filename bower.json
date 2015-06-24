@@ -1,0 +1,29 @@
+{
+  "name": "platerboil",
+  "version": "0.0.0",
+  "homepage": "https://github.com/rothattack/platerboil",
+  "authors": [
+    "Robert <rothattack@gmail.com>"
+  ],
+  "description": "A custom boilerplate for @rothattack's projects.",
+  "main": "app/index.html",
+  "keywords": [
+    "boilerplate",
+    "rothattack",
+    "sass",
+    "angular",
+    "ui-router"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "app/vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~1.11.3"
+  }
+}
