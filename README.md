@@ -22,6 +22,7 @@ As of now, just run to develop:
 gulp
 ```
 
-What's ahead?
+__What's ahead?__
+
 1. Adding Bootstrap SCSS files.
 2. Compiling source to a production friendly build.
