@@ -12,7 +12,8 @@ var gulp = require('gulp'),                             // g-god, main gulp
     jshint = require('gulp-jshint'),                    // validate js files
     concat = require('gulp-concat'),                    // concatinate js files
     // File structure tasks
-    rename = require("gulp-rename"),                    // for renaming files
+    rename = require('gulp-rename'),                    // for renaming files
+    sourcemaps = require('gulp-sourcemaps'),
     // Gulp & Misc. tasks
     svgmin = require('gulp-svgmin'),                    // well, minify svg files.
     notify = require('gulp-notify'),                    // osx only: pops a notification
@@ -118,7 +119,7 @@ gulp.task('svg', function() {
 *******************************************************************************/
 
 gulp.task('browser-sync', function() {
-    browserSync.init(['source/css/*.css', 'source/js/*.js'], {        // files to inject
+    browserSync.init(['source/css/*.css', 'source/js/*.js', 'source/**/*.html'], {        // files to inject
         server: {
             baseDir: './source'
         }
