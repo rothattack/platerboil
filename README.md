@@ -1,7 +1,8 @@
 # platerboil
 A project starter for HTML5 applications driven by Gulp.
 
-The following are the major technologies involved in this stack:
+#### The following are the major technologies involved in this stack:
+
 1. HTML5 Boilerplate
 2. SASS
 3. jQuery
@@ -22,7 +23,7 @@ As of now, just run to develop:
 gulp
 ```
 
-__What's ahead?__
+#### What's ahead?
 
 1. Adding Bootstrap SCSS files.
 2. Compiling source to a production friendly build.
