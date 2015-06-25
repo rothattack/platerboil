@@ -16,7 +16,7 @@ var gulp = require('gulp'),                             // g-god, main gulp
     sourcemaps = require('gulp-sourcemaps'),
     // Gulp & Misc. tasks
     svgmin = require('gulp-svgmin'),                    // well, minify svg files.
-    notify = require('gulp-notify'),                    // osx only: pops a notification
+    notify = require('gulp-notify'),                    // osx only: pops a notification
     plumber = require('gulp-plumber'),                  // proceeds with other task on error
     stylish = require('jshint-stylish'),                // make errors readable in shell
     browserSync = require('browser-sync');              // launch a server and refresh page on change
@@ -84,11 +84,14 @@ gulp.task('js-lint', function() {
 // minify all js files that should not be concatinated
 gulp.task('js-uglify', function() {
     gulp.src(source.jsUglify)                           // define the source file(s)
+        .pipe(sourcemaps.init())
         .pipe(uglify())                                 // uglify the files
-        .pipe(rename(function(dir,base,ext){            // give the files a min suffix
-            var trunc = base.split('.')[0];
-            return trunc + '.min' + ext;
+        .pipe(rename(function( path ){            // give the files a min suffix
+            // path.dirname += '/someDirectory'
+            path.basename += '.min';
+            path.extname = '.js';
         }))
+        .pipe(sourcemaps.write('vendors'))
         .pipe(gulp.dest(dest.js))                       // where to put the files
         .pipe(notify({ message: 'JS processed!'}));     // notify when done
 });
@@ -131,10 +134,10 @@ gulp.task('browser-sync', function() {
     GULP TASKS
 *******************************************************************************/
 
-gulp.task('default', ['sass', 'js-lint',/* 'js-uglify', */ 'js-concat', 'browser-sync'], function() {
+gulp.task('default', ['sass', 'js-lint', 'js-uglify', 'js-concat', 'browser-sync'], function() {
     gulp.watch( source.sass, ['sass']);
     gulp.watch( source.jsLint, ['js-lint']);
-    // gulp.watch( source.jsUglify, ['js-uglify']);
+    gulp.watch( source.jsUglify, ['js-uglify']);
     gulp.watch( source.jsConcat, ['js-concat']);
     gulp.watch( source.svg, ['svg']);
 });
