@@ -2,23 +2,23 @@
 
 
 // define our task dependencies
-var gulp = require('gulp');                             // g-god, main gulp
+var gulp = require('gulp'),                             // g-god, main gulp
     // CSS & SASS tasks
     sass = require('gulp-sass'),                        // sass compiler
-    autoPrefixer = require('gulp-autoprefixer');        // adds browser prefixes to css rules
+    autoPrefixer = require('gulp-autoprefixer'),        // adds browser prefixes to css rules
     minifyCss = require('gulp-minify-css'),             // minify css files
     // JS tasks
     uglify = require('gulp-uglify'),                    // uglifies js files
     jshint = require('gulp-jshint'),                    // validate js files
     concat = require('gulp-concat'),                    // concatinate js files
     // File structure tasks
-    rename = require("gulp-rename");                    // for renaming files
+    rename = require("gulp-rename"),                    // for renaming files
     // Gulp & Misc. tasks
-    svgmin = require('gulp-svgmin');                    // well, minify svg files.
-    notify = require('gulp-notify'),                    // osx only: pops a notification
+    svgmin = require('gulp-svgmin'),                    // well, minify svg files.
+    notify = require('gulp-notify'),                    // osx only: pops a notification
     plumber = require('gulp-plumber'),                  // proceeds with other task on error
     stylish = require('jshint-stylish'),                // make errors readable in shell
-    browserSync = require('browser-sync'),              // launch a server and refresh page on change
+    browserSync = require('browser-sync');              // launch a server and refresh page on change
 
 // layout our file and directory sources and destinations
 var source = {
@@ -42,7 +42,7 @@ var dest = {
     css : 'source/css',                                 // destination of compiled css files
     js : 'source/js/build',                             // destination of compiled js files
     build : 'build'                                     // destination of production ready app
-}
+};
 
 
 /*******************************************************************************
@@ -50,7 +50,7 @@ var dest = {
 *******************************************************************************/
 
 gulp.task('sass', function() {
-    gulp.src( source.sass )                             // define the source file(s)
+    gulp.src(source.sass)                               // define the source file(s)
         .pipe(plumber())                                // keep gulp running on errors
         .pipe(sass())                                   // compile all sass files
         .pipe(autoPrefixer(                             // correct css vendor prefixes
@@ -130,21 +130,10 @@ gulp.task('browser-sync', function() {
     GULP TASKS
 *******************************************************************************/
 
-gulp.task('default', function() {
-    gulp.run('sass', 'js-lint', 'js-uglify', 'js-concat', 'browser-sync');
-    gulp.watch( source.sass, function() {
-        gulp.run('sass');
-    });
-    gulp.watch( source.jsLint, function() {
-        gulp.run('js-lint');
-    });
-    gulp.watch( source.jsUglify, function() {
-        gulp.run('js-uglify');
-    });
-    gulp.watch( source.jsConcat, function() {
-        gulp.run('js-concat');
-    });
-    gulp.watch( source.svg, function() {
-        gulp.run('svg');
-    });
+gulp.task('default', ['sass', 'js-lint',/* 'js-uglify', */ 'js-concat', 'browser-sync'], function() {
+    gulp.watch( source.sass, ['sass']);
+    gulp.watch( source.jsLint, ['js-lint']);
+    // gulp.watch( source.jsUglify, ['js-uglify']);
+    gulp.watch( source.jsConcat, ['js-concat']);
+    gulp.watch( source.svg, ['svg']);
 });

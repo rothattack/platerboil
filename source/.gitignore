@@ -4,8 +4,9 @@ node_modules
 #ignore source components
 components
 
-#ignore dist folder
-dist
+#ignore build folder
+build
+js/build
 
 #ignore log files
 npm-debug.log
