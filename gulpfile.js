@@ -33,7 +33,7 @@ var source = {
     jsConcat : [                                        // all js files that should be concatinated
         'source/components/jquery/dist/jquery.min.js',
         'source/js/main.js'
-    },
+    ],
     svg : [
         'source/img/**/*.svg'
     ]
