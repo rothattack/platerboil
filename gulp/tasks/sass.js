@@ -5,8 +5,7 @@ var gulp = require('gulp'),
     notify = require('gulp-notify'),                    // osx only: pops a notification
     plumber = require('gulp-plumber'),                  // proceeds with other task on error
     sass = require('gulp-sass'),                        // sass compiler
-    autoPrefixer = require('gulp-autoprefixer'),        // adds browser prefixes to css rules
-    minifyCss = require('gulp-minify-css');             // minify css files
+    autoPrefixer = require('gulp-autoprefixer')         // adds browser prefixes to css rules
 
 
  module.exports = function( dependencies ) {
@@ -22,7 +21,6 @@ var gulp = require('gulp'),
                 'ios 6',
                 'android 4'
             ))
-            // .pipe(minifyCss())                           // minify css code
             .pipe(gulp.dest('./source/styles'))             // css files destination
             .pipe(notify({                                  // notify when done
                 message: 'SASS Task: CSS Compilation complete!'
