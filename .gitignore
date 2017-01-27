@@ -6,7 +6,7 @@ source/lib
 source/styles
 
 #ignore dist folder
-dist
+build
 
 #ignore log files
 npm-debug.log
