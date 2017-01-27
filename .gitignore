@@ -3,6 +3,7 @@ node_modules
 
 #ignore source dependencies
 source/lib
+source/styles
 
 #ignore dist folder
 dist
