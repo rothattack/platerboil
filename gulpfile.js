@@ -1,16 +1,10 @@
-
-
-
 // define our task dependencies
-var gulp = require('gulp'),                             // g-god, main gulp
-    // CSS & SASS tasks
-    sass = require('gulp-sass'),                        // sass compiler
-    autoPrefixer = require('gulp-autoprefixer'),        // adds browser prefixes to css rules
-    minifyCss = require('gulp-minify-css'),             // minify css files
+const gulp = require('gulp'),                             // g-god, main gulp
     // JS tasks
     uglify = require('gulp-uglify'),                    // uglifies js files
     jshint = require('gulp-jshint'),                    // validate js files
     concat = require('gulp-concat'),                    // concatinate js files
+    inject = require('gulp-inject'),                    // inject JS and CSS unto html
     // File structure tasks
     rename = require('gulp-rename'),                    // for renaming files
     sourcemaps = require('gulp-sourcemaps'),
@@ -18,8 +12,11 @@ var gulp = require('gulp'),                             // g-god, main gulp
     svgmin = require('gulp-svgmin'),                    // well, minify svg files.
     notify = require('gulp-notify'),                    // osx only: pops a notification
     plumber = require('gulp-plumber'),                  // proceeds with other task on error
+    del     = require('del'),                           // delete files and/or directories
     stylish = require('jshint-stylish'),                // make errors readable in shell
     browserSync = require('browser-sync');              // launch a server and refresh page on change
+
+    var sassTest = require('./gulp/tasks/sass.task')
 
 // layout our file and directory sources and destinations
 var source = {
@@ -50,24 +47,7 @@ var dest = {
     SASS TASK
 *******************************************************************************/
 
-gulp.task('sass', function() {
-    gulp.src(source.sass)                               // define the source file(s)
-        .pipe(plumber())                                // keep gulp running on errors
-        .pipe(sass())                                   // compile all sass files
-        .pipe(autoPrefixer(                             // correct css vendor prefixes
-            'last 2 version',
-            '> 1%',
-            'ie 8',
-            'ie 9',
-            'ios 6',
-            'android 4'
-        ))
-        .pipe(minifyCss())                              // minify css code
-        .pipe(gulp.dest(dest.css))                      // css files destination
-        .pipe(notify({                                  // notify when done
-            message: 'SCSS: Compilation complete!'
-        }));
-});
+gulp.task('sass', sassTest)
 
 
 /*******************************************************************************
@@ -86,7 +66,7 @@ gulp.task('js-uglify', function() {
     gulp.src(source.jsUglify)                           // define the source file(s)
         .pipe(sourcemaps.init())
         .pipe(uglify())                                 // uglify the files
-        .pipe(rename(function( path ){            // give the files a min suffix
+        .pipe(rename(function( path ){                  // give the files a min suffix
             // path.dirname += '/someDirectory'
             path.basename += '.min';
             path.extname = '.js';
@@ -105,6 +85,18 @@ gulp.task('js-concat', function() {
         .pipe(notify({message: 'JS processed!'}));      // notify when done
 });
 
+gulp.task('js:dev', () => {
+    var target = gulp.src('./source/index.html'),
+        source = gulp.src('./source/scripts/**/*.js', { read: false }),
+        dest   = gulp.dest('./source');
+
+    return target.pipe(inject(source, {
+            starttag: '<!-- inject:body:{{ext}} -->',
+            relative: true
+        }))
+        .pipe(dest);
+})
+
 
 /*******************************************************************************
     SVG MINIFICATION
@@ -114,6 +106,36 @@ gulp.task('svg', function() {
     return gulp.src('assets/img/build/*.svg')
         .pipe(svgmin())
         .pipe(gulp.dest('assets/img'));
+});
+
+
+/*******************************************************************************
+    BUILD OUR DEPENDENCY LIBRARY
+*******************************************************************************/
+// Copy the build files for our dependencies from node_modules.
+// Just add the path to any dependency you may add in the future
+// within the "dependencies" array variable.
+gulp.task('copy:lib', () => {
+    var dependencies = [
+        // './node_modules/jquery/dist/jquery.js',
+        './node_modules/angular/angular.js',
+        './node_modules/angular-ui-router/release/angular-ui-router.js'
+    ]
+    // clean lib folder and then copy dependencies
+    del('./source/lib', ( err ) => {
+        return gulp.src(dependencies)
+            .pipe(gulp.dest('./source/lib'))
+    })
+});
+// This will inject any javascript dependencies within the <head>
+// of our index.html file.
+gulp.task('inject:head:js', ['copy:lib'], () => {
+    var target = gulp.src('./source/index.html'),
+        source = gulp.src('./source/lib/**/*.js', { read: false }),
+        dest   = gulp.dest('./source');
+
+    return target.pipe(inject(source, { starttag: '<!-- inject:head:{{ext}} -->', relative: true }))
+        .pipe(dest);
 });
 
 
@@ -134,10 +156,14 @@ gulp.task('browser-sync', function() {
     GULP TASKS
 *******************************************************************************/
 
-gulp.task('default', ['sass', 'js-lint', 'js-uglify', 'js-concat', 'browser-sync'], function() {
+gulp.task('default', ['sass', 'js-lint', 'js-uglify', 'js-concat', 'inject:head:js', 'browser-sync'], function() {
     gulp.watch( source.sass, ['sass']);
     gulp.watch( source.jsLint, ['js-lint']);
     gulp.watch( source.jsUglify, ['js-uglify']);
     gulp.watch( source.jsConcat, ['js-concat']);
     gulp.watch( source.svg, ['svg']);
 });
+
+gulp.task('dev', ['js:dev'], () => {
+
+})
