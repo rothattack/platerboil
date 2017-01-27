@@ -5,6 +5,7 @@ const gulp = require('gulp'),                             // g-god, main gulp
     jshint = require('gulp-jshint'),                    // validate js files
     concat = require('gulp-concat'),                    // concatinate js files
     inject = require('gulp-inject'),                    // inject JS and CSS unto html
+    angularFilesort = require('gulp-angular-filesort'), // Angular file sorter
     // File structure tasks
     rename = require('gulp-rename'),                    // for renaming files
     sourcemaps = require('gulp-sourcemaps'),
@@ -16,7 +17,6 @@ const gulp = require('gulp'),                             // g-god, main gulp
     stylish = require('jshint-stylish'),                // make errors readable in shell
     browserSync = require('browser-sync');              // launch a server and refresh page on change
 
-    var sassTest = require('./gulp/tasks/sass.task')
 
 // layout our file and directory sources and destinations
 var source = {
@@ -47,7 +47,8 @@ var dest = {
     SASS TASK
 *******************************************************************************/
 
-gulp.task('sass', sassTest)
+require('./gulp/tasks/sass')();
+require('./gulp/tasks/styles')(['sass']);
 
 
 /*******************************************************************************
@@ -124,6 +125,7 @@ gulp.task('copy:lib', () => {
     // clean lib folder and then copy dependencies
     del('./source/lib', ( err ) => {
         return gulp.src(dependencies)
+            .pipe(angularFilesort())
             .pipe(gulp.dest('./source/lib'))
     })
 });
@@ -131,10 +133,13 @@ gulp.task('copy:lib', () => {
 // of our index.html file.
 gulp.task('inject:head:js', ['copy:lib'], () => {
     var target = gulp.src('./source/index.html'),
-        source = gulp.src('./source/lib/**/*.js', { read: false }),
+        coreAngular = gulp.src('./source/lib/angular.js', { read: false })
+        source = gulp.src(['./source/lib/**/*.js', '!./source/lib/angular.js'], { read: false }),
         dest   = gulp.dest('./source');
 
-    return target.pipe(inject(source, { starttag: '<!-- inject:head:{{ext}} -->', relative: true }))
+    return target
+        .pipe(inject(coreAngular, { starttag: '<!-- inject:angular:{{ext}} -->', relative: true }))
+        .pipe(inject(source, { starttag: '<!-- inject:head:{{ext}} -->', relative: true }))
         .pipe(dest);
 });
 
@@ -156,7 +161,7 @@ gulp.task('browser-sync', function() {
     GULP TASKS
 *******************************************************************************/
 
-gulp.task('default', ['sass', 'js-lint', 'js-uglify', 'js-concat', 'inject:head:js', 'browser-sync'], function() {
+gulp.task('default', ['styles', 'js-lint', 'js-uglify', 'js-concat', 'inject:head:js', 'browser-sync'], function() {
     gulp.watch( source.sass, ['sass']);
     gulp.watch( source.jsLint, ['js-lint']);
     gulp.watch( source.jsUglify, ['js-uglify']);
