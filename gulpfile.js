@@ -16,16 +16,15 @@ const gulp = require('gulp'),                             // g-god, main gulp
     del     = require('del'),                           // delete files and/or directories
     stylish = require('jshint-stylish'),                // make errors readable in shell
     browserSync = require('browser-sync');              // launch a server and refresh page on change
+    minifyCss = require('gulp-minify-css');             // minify css files
 
 
 // layout our file and directory sources and destinations
 var source = {
-    sass : 'source/scss/**/*.scss',                     // all sass files
-    jsLint : [                                          // all js that should be linted
-        'source/js/build/custom.js'
-    ],
+    sass : './source/scss/**/*.scss',                   // all sass files
+    jsLint : ['source/js/build/custom.js'],
     jsUglify : [                                        // all js files that should not be concatinated
-        'source/components/modernizr/modernizr.js'
+        ''
     ],
     jsConcat : [                                        // all js files that should be concatinated
         'source/components/jquery/dist/jquery.min.js',
@@ -37,18 +36,22 @@ var source = {
 };
 
 var dest = {
-    css : 'source/css',                                 // destination of compiled css files
-    js : 'source/js/build',                             // destination of compiled js files
+    css : 'source/styles',                                 // destination of compiled css files
+    js : 'source/scripts',                             // destination of compiled js files
     build : 'build'                                     // destination of production ready app
 };
 
 
 /*******************************************************************************
+    GULP DEVELOPMENT TASKS
+*******************************************************************************/
+
+/*******************************************************************************
     SASS TASK
 *******************************************************************************/
 
-require('./gulp/tasks/sass')();
-require('./gulp/tasks/styles')(['sass']);
+require('./gulp/tasks/sass')(); // task "sass"
+require('./gulp/tasks/styles')(['sass']); // task "styles"
 
 
 /*******************************************************************************
@@ -64,14 +67,14 @@ gulp.task('js-lint', function() {
 
 // minify all js files that should not be concatinated
 gulp.task('js-uglify', function() {
-    gulp.src(source.jsUglify)                           // define the source file(s)
+    gulp.src('./build/scripts/**/*.js')                 // define the source file(s)
         .pipe(sourcemaps.init())
         .pipe(uglify())                                 // uglify the files
-        .pipe(rename(function( path ){                  // give the files a min suffix
-            // path.dirname += '/someDirectory'
-            path.basename += '.min';
-            path.extname = '.js';
-        }))
+        // .pipe(rename(function( path ){                  // give the files a min suffix
+        //     // path.dirname += '/someDirectory'
+        //     path.basename += '.min';
+        //     path.extname = '.js';
+        // }))
         .pipe(sourcemaps.write('vendors'))
         .pipe(gulp.dest(dest.js))                       // where to put the files
         .pipe(notify({ message: 'JS processed!'}));     // notify when done
@@ -161,14 +164,55 @@ gulp.task('browser-sync', function() {
     GULP TASKS
 *******************************************************************************/
 
-gulp.task('default', ['styles', 'js-lint', 'js-uglify', 'js-concat', 'inject:head:js', 'browser-sync'], function() {
-    gulp.watch( source.sass, ['sass']);
-    gulp.watch( source.jsLint, ['js-lint']);
+gulp.task('default', ['styles', 'js-lint', 'js-concat', 'inject:head:js', 'browser-sync'], function() {
+    gulp.watch('./source/scss/**/*.scss', ['styles']);
+    gulp.watch('./source/scripts/**/*.js', ['js-lint']);
     gulp.watch( source.jsUglify, ['js-uglify']);
     gulp.watch( source.jsConcat, ['js-concat']);
     gulp.watch( source.svg, ['svg']);
 });
 
-gulp.task('dev', ['js:dev'], () => {
 
+
+/*******************************************************************************
+    GULP PRODUCTION TASKS
+*******************************************************************************/
+
+// Copy files in ./source root
+gulp.task('build:copy', () => {
+    return gulp.src('./source/*.*')
+        .pipe(gulp.dest('./.tmp'))
+})
+
+// Build our JS scripts
+gulp.task('build:scripts', () => {
+    return gulp.src('./source/scripts/**/*.js')
+        .pipe(angularFilesort())
+        .pipe(concat('app.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest('./.tmp/scripts'))
+})
+
+// Build our CSS styles
+gulp.task('build:styles', ['styles'], () => {
+    return gulp.src('./source/styles/**/*.css')
+        .pipe(minifyCss())
+        .pipe(gulp.dest('./.tmp/styles'))
+})
+
+// Build our production application
+gulp.task('build', ['build:copy', 'build:scripts', 'build:styles'], () => {
+    var cleanBuild = new Promise(( resolve, reject ) => {
+        del('./build', () => {
+            return gulp.src('./.tmp/**/*')
+                .pipe(gulp.dest('./build'))
+                .on('end', resolve)
+        })
+    });
+
+    cleanBuild.then( () => {
+        return del('./.tmp', () => {
+            console.log('BUILD: C O M P L E T E!')
+        })
+    })
 })
