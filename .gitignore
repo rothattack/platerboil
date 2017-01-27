@@ -1,6 +1,9 @@
 #ignore node modules
 node_modules
 
+#ignore source dependencies
+source/lib
+
 #ignore dist folder
 dist
 
